@@ -5,7 +5,7 @@ import static ru.lebedev.tm.constant.TerminalConst.*;
 /**
  * Тестовое приложение
  */
-public class Main {
+public class App {
 
 
     public static void main(final String[] args) {
