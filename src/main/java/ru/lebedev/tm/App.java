@@ -27,22 +27,29 @@ public class App {
         final String param = args[0];
         final int result = run(param);
         System.exit(result);
-        }
+    }
 
     private static int run(final String param) {
         if (param == null) return -1;
         switch (param) {
-            case VERSION: return displayVersion();
-            case ABOUT: return displayAbout();
-            case HELP: return displayHelp();
-            case EXIT: return displayExit();
-            default: return displayError();
+            case VERSION:
+                return displayVersion();
+            case ABOUT:
+                return displayAbout();
+            case HELP:
+                return displayHelp();
+            case EXIT:
+                return displayExit();
+            default:
+                return displayError();
         }
     }
+
     private static int displayExit() {
         System.out.println("Terminate program...");
         return 0;
     }
+
     private static int displayError() {
         System.out.println("Error! Unknown program argument...");
         return -1;
@@ -52,7 +59,7 @@ public class App {
         System.out.println("** WELCOME TASK MANAGER **");
     }
 
-    private static int displayHelp(){
+    private static int displayHelp() {
         System.out.println("version - Display application version.");
         System.out.println("about - Display developer info.");
         System.out.println("help - Display list of commands.");
@@ -60,17 +67,17 @@ public class App {
         return 0;
     }
 
-    private static int displayVersion(){
+    private static int displayVersion() {
         System.out.println("1.0.0");
         return 0;
 
     }
 
-    private static int displayAbout(){
+    private static int displayAbout() {
         System.out.println("Paul Lebedev");
         System.out.println("paul@lebedev.ru");
         return 0;
 
     }
 
- }
+}
