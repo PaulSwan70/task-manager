@@ -35,9 +35,20 @@ java -jar task-manager-1.0.7.jar
 - *`project-create` - создать проект*
 - *`project-clear` - удалить все проекты*
 - *`project-list` - отобразить список проектов*
+- *`project-view` - отобразить информацию о проекте*
+- *`project-remove-by-name` - удалить проект по имени*
+- *`project-remove-by-id` - удалить проект по идентификатору*
+- *`project-remove-by-index` - удалить проект по индексу*
+- *`project-update-by-index` - обновить проект по идексу*
+
 ```
 команды управления задачами:
 ```
 - *`task-create` - создать задачу*
 - *`task-clear` - удалить все задачи*
 - *`task-list` - отобразить список задач*
+- *`task-view` - отобразить информацию о задаче*
+- *`task-remove-by-name` - удалить задачу по имени*
+- *`task-remove-by-id` - удалить задачу по идентификатору*
+- *`task-remove-by-index` - удалить задачу по индексу*
+- *`task-update-by-index` - обновить задачу по индексу*
