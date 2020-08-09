@@ -1,9 +1,12 @@
 package ru.lebedev.tm;
 
-import ru.lebedev.tm.dao.ProjectDAO;
-import ru.lebedev.tm.dao.TaskDAO;
-import ru.lebedev.tm.entity.Project;
-import ru.lebedev.tm.entity.Task;
+import ru.lebedev.tm.controller.ProjectController;
+import ru.lebedev.tm.controller.SystemController;
+import ru.lebedev.tm.controller.TaskController;
+import ru.lebedev.tm.repository.ProjectRepository;
+import ru.lebedev.tm.repository.TaskRepository;
+import ru.lebedev.tm.service.ProjectService;
+import ru.lebedev.tm.service.TaskService;
 
 import java.util.Scanner;
 
@@ -14,32 +17,40 @@ import static ru.lebedev.tm.constant.TerminalConst.*;
  */
 public class App {
 
-    private static final ProjectDAO projectDAO = new ProjectDAO();
-    
-    private static final TaskDAO taskDAO = new TaskDAO();
+    private final ProjectRepository projectRepository = new ProjectRepository();
 
-    private static  final Scanner scanner = new Scanner(System.in);
+    private final TaskRepository taskRepository = new TaskRepository();
 
-    static {
-        projectDAO.create("DEMO PROJECT 1", "DESCRIPTION 1");
-        projectDAO.create("DEMO PROJECT 2", "DESCRIPTION 2");
-        taskDAO.create("TEST TASK 1", "DESCRIPTION 1");
-        taskDAO.create("TEST TASK 2", "DESCRIPTION 2");
+    private final ProjectService projectService = new ProjectService(projectRepository);
+
+    private final TaskService taskService = new TaskService(taskRepository);
+
+    private final ProjectController projectController = new ProjectController(projectService);
+
+    private final TaskController taskController = new TaskController(taskService);
+
+    private final SystemController systemController = new SystemController();
+
+    {
+        projectService.create("DP 1", "DEMO PROJECT 1");
+        projectService.create("DP 2", "DEMO PROJECT 2");
+        taskService.create("TEST 1", "TEST TASK 1");
+        taskService.create("TEST 2", "TEST TASK 2");
     }
 
-
     public static void main(final String[] args) {
-        run(args);
-        displayWelcome();
-
+        final Scanner scanner = new Scanner(System.in);
+        final App app = new App();
+        app.run(args);
+        app.systemController.displayWelcome();
         String command = "";
         while (!EXIT.equals(command)) {
             command = scanner.nextLine();
-            run(command);
+            app.run(command);
         }
     }
 
-    private static void run(final String[] args) {
+    public void run(final String[] args) {
         if (args == null) return;
         if (args.length < 1) return;
         final String param = args[0];
@@ -47,286 +58,35 @@ public class App {
         System.exit(result);
     }
 
-    private static int run(final String param) {
+    public int run(final String param) {
         if (param == null || param.isEmpty()) return -1;
         switch (param) {
-            case VERSION: return displayVersion();
-            case ABOUT: return displayAbout();
-            case HELP: return displayHelp();
-            case EXIT: return displayExit();
+            case VERSION: return systemController.displayVersion();
+            case ABOUT: return systemController.displayAbout();
+            case HELP: return systemController.displayHelp();
+            case EXIT: return systemController.displayExit();
 
-            case PROJECT_CREATE: return createProject();
-            case PROJECT_CLEAR: return clearProject();
-            case PROJECT_LIST: return listProject();
-            case PROJECT_VIEW: return viewProjectByIndex();
-            case PROJECT_REMOVE_BY_NAME: return removeProjectByName();
-            case PROJECT_REMOVE_BY_ID: return removeProjectById();
-            case PROJECT_REMOVE_BY_INDEX: return removeProjectByIndex();
-            case PROJECT_UPDATE_BY_INDEX: return updateProjectByIndex();
+            case PROJECT_CREATE: return projectController.createProject();
+            case PROJECT_CLEAR: return projectController.clearProject();
+            case PROJECT_LIST: return projectController.listProject();
+            case PROJECT_VIEW: return projectController.viewProjectByIndex();
+            case PROJECT_REMOVE_BY_NAME: return projectController.removeProjectByName();
+            case PROJECT_REMOVE_BY_ID: return projectController.removeProjectById();
+            case PROJECT_REMOVE_BY_INDEX: return projectController.removeProjectByIndex();
+            case PROJECT_UPDATE_BY_INDEX: return projectController.updateProjectByIndex();
 
 
-            case TASK_CREATE: return createTask();
-            case TASK_CLEAR: return clearTask();
-            case TASK_LIST: return listTask();
-            case TASK_VIEW: return viewTaskByIndex();
-            case TASK_REMOVE_BY_NAME: return removeTaskByName();
-            case TASK_REMOVE_BY_ID: return removeTaskById();
-            case TASK_REMOVE_BY_INDEX: return removeTaskByIndex();
-            case TASK_UPDATE_BY_INDEX: return updateTaskByIndex();
+            case TASK_CREATE: return taskController.createTask();
+            case TASK_CLEAR: return taskController.clearTask();
+            case TASK_LIST: return taskController.listTask();
+            case TASK_VIEW: return taskController.viewTaskByIndex();
+            case TASK_REMOVE_BY_NAME: return taskController.removeTaskByName();
+            case TASK_REMOVE_BY_ID: return taskController.removeTaskById();
+            case TASK_REMOVE_BY_INDEX: return taskController.removeTaskByIndex();
+            case TASK_UPDATE_BY_INDEX: return taskController.updateTaskByIndex();
 
-            default: return displayError();
+            default: return systemController.displayError();
         }
-    }
-
-    private static int createProject() {
-        System.out.println("[CREATE PROJECT]");
-        System.out.println("PLEASE, ENTER PROJECT NAME:");
-        final String name = scanner.nextLine();
-        System.out.println("PLEASE, ENTER PROJECT DESCRIPTION:");
-        final String description = scanner.nextLine();
-        projectDAO.create(name, description);
-        System.out.println("[OK]");
-        return 0;
-    }
-
-    private static int updateProjectByIndex() {
-        System.out.println("[UPDATE PROJECT]");
-        System.out.println("ENTER, PROJECT INDEX:");
-        final int index = Integer.parseInt(scanner.nextLine()) - 1;
-        final Project project = projectDAO.findByIndex(index);
-        if (project == null) {
-            System.out.println("[FAIL]");
-            return 0;
-        }
-        System.out.println("PLEASE, ENTER PROJECT NAME:");
-        final String name = scanner.nextLine();
-        System.out.println("PLEASE, ENTER PROJECT DESCRIPTION:");
-        final String description = scanner.nextLine();
-        projectDAO.update(project.getId(), name, description);
-        System.out.println("[OK]");
-        return 0;
-    }
-
-    private static int removeProjectByName() {
-        System.out.println("[REMOVE PROJECT BY NAME]");
-        System.out.println("PLEASE, ENTER PROJECT NAME:");
-        final String name = scanner.nextLine();
-        final Project project = projectDAO.removeByName(name);
-        if (project == null) System.out.println("[FAIL]");
-        else System.out.println("[OK]");
-        return 0;
-
-    }
-
-    private static int removeProjectById() {
-        System.out.println("[REMOVE PROJECT BY ID]");
-        System.out.println("PLEASE, ENTER PROJECT ID:");
-        final long id = scanner.nextLong();
-        final Project project = projectDAO.removeById(id);
-        if (project == null) System.out.println("[FAIL]");
-        else System.out.println("[OK]");
-        return 0;
-
-    }
-
-    private static int removeProjectByIndex() {
-        System.out.println("[REMOVE PROJECT BY INDEX]");
-        System.out.println("PLEASE, ENTER PROJECT INDEX:");
-        final int index = scanner.nextInt() - 1;
-        final Project project = projectDAO.removeByIndex(index);
-        if (project == null) System.out.println("[FAIL]");
-        else System.out.println("[OK]");
-        return 0;
-
-    }
-
-    private static int clearProject() {
-        System.out.println("[CLEAR PROJECT]");
-        projectDAO.clear();
-        System.out.println("[OK]");
-        return 0;
-    }
-
-    private static int listProject() {
-        System.out.println("[LIST PROJECT]");
-        int index = 1;
-        for (final Project project: projectDAO.findAll()) {
-            System.out.println(index + ". " + project.getId() + ": " + project.getName());
-            index++;
-        }
-        System.out.println("[OK]");
-        return 0;
-    }
-
-    private static void viewProject(final Project project) {
-        if (project == null) return;
-        System.out.println("[VIEW PROJECT]");
-        System.out.println("ID: " + project.getId());
-        System.out.println("NAME: " + project.getName());
-        System.out.println("DESCRIPTION: " + project.getDescription());
-        System.out.println("[OK]");
-
-    }
-
-    private static int viewProjectByIndex() {
-        System.out.println("ENTER, PROJECT INDEX:");
-        final int index = scanner.nextInt() - 1;
-        final Project project = projectDAO.findByIndex(index);
-        viewProject(project);
-        return 0;
-
-    }
-
-    private static int createTask() {
-        System.out.println("[CREATE TASK]");
-        System.out.println("PLEASE, ENTER TASK NAME:");
-        final String name = scanner.nextLine();
-        System.out.println("PLEASE, ENTER TASK DESCRIPTION:");
-        final String description = scanner.nextLine();
-        taskDAO.create(name, description);
-        System.out.println("[OK]");
-        return 0;
-    }
-
-    private static int clearTask() {
-        System.out.println("[CLEAR TASK]");
-        taskDAO.clear();
-        System.out.println("[OK]");
-        return 0;
-    }
-
-     private static int listTask() {
-        System.out.println("[LIST TASK]");
-        int index = 1;
-        for (final Task task: taskDAO.findAll() ){
-            System.out.println(index + ". " + task.getId() + ": " + task.getName());
-            index++;
-        }
-        System.out.println("[OK]");
-        return 0;
-    }
-
-    private static void viewTask(final Task task) {
-        if (task == null) return;
-        System.out.println("[VIEW TASK]");
-        System.out.println("ID: " + task.getId());
-        System.out.println("NAME: " + task.getName());
-        System.out.println("DESCRIPTION: " + task.getDescription());
-        System.out.println("[OK]");
-
-    }
-
-    private static int viewTaskByIndex() {
-        System.out.println("ENTER, TASK INDEX:");
-        final int index = scanner.nextInt() - 1;
-        final Task task = taskDAO.findByIndex(index);
-        viewTask(task);
-        return 0;
-
-    }
-
-    private static int removeTaskByName() {
-        System.out.println("[REMOVE TASK BY NAME]");
-        System.out.println("PLEASE, ENTER TASK NAME:");
-        final String name = scanner.nextLine();
-        final Task task = taskDAO.removeByName(name);
-        if (task == null) System.out.println("[FAIL]");
-        else System.out.println("[OK]");
-        return 0;
-
-    }
-
-    private static int removeTaskById() {
-        System.out.println("[REMOVE TASK BY ID]");
-        System.out.println("PLEASE, ENTER TASK ID:");
-        final long id = scanner.nextLong();
-        final Task task = taskDAO.removeById(id);
-        if (task == null) System.out.println("[FAIL]");
-        else System.out.println("[OK]");
-        return 0;
-
-    }
-
-    private static int removeTaskByIndex() {
-        System.out.println("[REMOVE TASK BY INDEX]");
-        System.out.println("PLEASE, ENTER TASK INDEX:");
-        final int index = scanner.nextInt() - 1;
-        final Task task = taskDAO.removeByIndex(index);
-        if (task == null) System.out.println("[FAIL]");
-        else System.out.println("[OK]");
-        return 0;
-
-    }
-
-    private static int updateTaskByIndex() {
-        System.out.println("[UPDATE TASK BY INDEX]");
-        System.out.println("ENTER, TASK INDEX:");
-        final int index = Integer.parseInt(scanner.nextLine()) - 1;
-        final Task task = taskDAO.findByIndex(index);
-        if (task == null) {
-            System.out.println("[FAIL]");
-            return 0;
-        }
-        System.out.println("PLEASE, ENTER TASK NAME:");
-        final String name = scanner.nextLine();
-        System.out.println("PLEASE, ENTER TASK DESCRIPTION:");
-        final String description = scanner.nextLine();
-        taskDAO.update(task.getId(), name, description);
-        System.out.println("[OK]");
-        return 0;
-    }
-
-    private static int displayExit() {
-        System.out.println("Terminate program...");
-        return 0;
-    }
-
-    private static int displayError() {
-        System.out.println("Error! Unknown program argument...");
-        return -1;
-    }
-
-    private static void displayWelcome() {
-        System.out.println("** WELCOME TASK MANAGER **");
-    }
-
-    private static int displayHelp() {
-        System.out.println("version - Display application version.");
-        System.out.println("about - Display developer info.");
-        System.out.println("help - Display list of commands.");
-        System.out.println("exit - Terminate console application.");
-        System.out.println();
-        System.out.println("project-list - Display list of projects.");
-        System.out.println("project-create - Create a new project by name.");
-        System.out.println("project-clear - Remove all projects.");
-        System.out.println("project-view - Display information about project.");
-        System.out.println("project-remove-by-name - Remove a project by name.");
-        System.out.println("project-remove-by-id - Remove a project by id.");
-        System.out.println("project-remove-by-index - Remove a project by index.");
-        System.out.println("project-update-by-index - Update a project by index.");
-        System.out.println();
-        System.out.println("task-list - Display list of tasks.");
-        System.out.println("task-create - Create a new task by name.");
-        System.out.println("task-clear - Remove all tasks.");
-        System.out.println("task-view - Display information about task.");
-        System.out.println("task-remove-by-name - Remove a task by name.");
-        System.out.println("task-remove-by-id - Remove a task by id.");
-        System.out.println("task-remove-by-index - Remove a task by index.");
-        System.out.println("task-update-by-index - Update a task by index.");
-        return 0;
-    }
-
-    private static int displayVersion() {
-        System.out.println("1.0.0");
-        return 0;
-
-    }
-
-    private static int displayAbout() {
-        System.out.println("Paul Lebedev");
-        System.out.println("paul@lebedev.ru");
-        return 0;
-
     }
 
  }

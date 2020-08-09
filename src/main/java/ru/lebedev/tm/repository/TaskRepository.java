@@ -1,14 +1,13 @@
-package ru.lebedev.tm.dao;
+package ru.lebedev.tm.repository;
 
-import ru.lebedev.tm.entity.Project;
 import ru.lebedev.tm.entity.Task;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskDAO {
+public class TaskRepository {
 
-    private List<Task> tasks = new ArrayList<>();
+    public List<Task> tasks = new ArrayList<>();
 
     public Task create(final String name) {
         final Task task = new Task(name);
@@ -39,12 +38,10 @@ public class TaskDAO {
     }
 
     public Task findByIndex(final int index) {
-        if (index < 0 || index > tasks.size() - 1) return null;
         return tasks.get(index);
     }
 
     public Task findByName(final String name) {
-        if (name == null || name.isEmpty()) return null;
         for (final Task task: tasks) {
             if(task.getName().equals(name)) return task;
         }

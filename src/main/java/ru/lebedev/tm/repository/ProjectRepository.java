@@ -1,15 +1,13 @@
-package ru.lebedev.tm.dao;
+package ru.lebedev.tm.repository;
 
 import ru.lebedev.tm.entity.Project;
-import ru.lebedev.tm.entity.Task;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class ProjectDAO {
+public class ProjectRepository {
 
-    private List<Project> projects = new ArrayList<>();
+    public List<Project> projects = new ArrayList<>();
 
     public Project create(final String name) {
         final Project project = new Project(name);
@@ -40,7 +38,6 @@ public class ProjectDAO {
     }
 
     public Project findByIndex(final int index) {
-        if (index < 0 || index > projects.size() - 1) return null;
         return projects.get(index);
     }
 
@@ -49,7 +46,6 @@ public class ProjectDAO {
     }
 
     public Project findByName(final String name) {
-        if (name == null || name.isEmpty()) return null;
         for (final Project project: projects) {
             if(project.getName().equals(name)) return project;
         }
@@ -58,8 +54,7 @@ public class ProjectDAO {
     }
 
     public Project findById(final Long id) {
-        if (id == null) return null;
-        for (final Project project: projects) {
+       for (final Project project: projects) {
             if(project.getId().equals(id)) return project;
         }
         return null;
@@ -91,13 +86,13 @@ public class ProjectDAO {
     }
 
     public static void main(String[] args) {
-        final ProjectDAO projectDAO = new ProjectDAO();
-        projectDAO.create("DEMO");
-        projectDAO.create("TEST");
-        System.out.println(projectDAO.findAll());
-        System.out.println(projectDAO);
-        projectDAO.clear();
-        System.out.println(projectDAO);
+        final ProjectRepository projectRepository = new ProjectRepository();
+        projectRepository.create("DEMO");
+        projectRepository.create("TEST");
+        System.out.println(projectRepository.findAll());
+        System.out.println(projectRepository);
+        projectRepository.clear();
+        System.out.println(projectRepository);
     }
 
 }

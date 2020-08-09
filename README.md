@@ -17,7 +17,7 @@ https://github.com/PaulSwan70/task-manager
 ##### Команды для запуска приложения.
 *Команда запуска приложения:*
 ```
-java -jar task-manager-1.0.7.jar
+java -jar task-manager-1.0.9.jar
 ```
 
 *Запуск осуществляется из директории* `target` *проекта.*

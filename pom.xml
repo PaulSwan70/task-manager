@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.lebedev.tm</groupId>
     <artifactId>task-manager</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.9</version>
 
     <name>task-manager</name>
     <url>http://tm.lebedev.ru</url>
